@@ -3,7 +3,9 @@ package sorting;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Algorithms { 
+public class Algorithms {     
+    public static final int MAX_ROWS = 100;
+    public static final int MAX_COLUMNS = 10;
     private int[] arr;
     private int arrSize = 10;
     private int generation = 0;
@@ -13,23 +15,7 @@ public class Algorithms {
         randomize(arr, arrSize);
     }
 
-    /*
-     * Fisher-Yates Shuffle Algorithm from geeksforgeeks.org
-     * You can learn more about the algorithm here:
-     * https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ 
-     */
-    public void randomize(int arr[], int n) {
-        Random r = new Random();
-        for (int i = n-1; i > 0; i--) {
-            int j = r.nextInt(i+1);     // Pick a random index from 0 to i
-            
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
-    }
-
-
+    // TODO: Update a 2D array in every single alg method
 
     public void SelectionSort() {
         int smPos = generation;
@@ -139,5 +125,32 @@ public class Algorithms {
         }
     }
 
+
+    /*
+     * Fisher-Yates Shuffle Algorithm from geeksforgeeks.org
+     * You can learn more about the algorithm here:
+     * https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ 
+     */
+    public void randomize(int arr[], int n) {
+        Random r = new Random();
+        for (int i = n-1; i > 0; i--) {
+            int j = r.nextInt(i+1);     // Pick a random index from 0 to i
+            
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+
+
+    /** Accessor method -- returns the number of times an algorithm has been interated. */
+    public int getGeneration() {
+        return generation;
+    }
+
+    /** Resets the generation count to 0. */
+    public void resetGeneration() {
+        generation = 0;
+    }
 
 }
