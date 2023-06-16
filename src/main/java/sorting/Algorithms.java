@@ -4,23 +4,40 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Algorithms {     
-    public static final int MAX_ROWS = 100;
-    public static final int MAX_COLUMNS = 10;
-    private int[] arr;
-    private int arrSize = 10;
+    public static final int MAX_COLUMNS = 5;    // number of elements in arr
+    public static int MAX_ROWS;
+    private boolean[][] grid;
+    private static int[] arr;
+    private int arrSize = MAX_COLUMNS;
     private int generation = 0;
 
     public Algorithms() {
         arr = new int[arrSize];
-        randomize(arr, arrSize);
+        Random r = new Random();
+
+        // creates an array of random numbers
+        for (int i = 0; i < arrSize; i++) {
+            int rng = r.nextInt(5) + 1; // rng from 1-5
+            arr[i] = i * rng;
+        }
+
+        // finds the largest element in the array 
+        MAX_ROWS = arr[0];
+        for (int i = 1; i < arrSize; i++) {
+            if (arr[i] > MAX_ROWS) {
+                MAX_ROWS = arr[i];
+            }
+        }
+
+        grid = new boolean[MAX_ROWS][MAX_COLUMNS];
+        randomize(arr, arrSize);    // shuffles the array
     }
 
-    // TODO: Update a 2D array in every single alg method
 
     public void SelectionSort() {
         int smPos = generation;
 
-        // finds the smallest element of the list 
+        // finds the smallest element in the unsorted section of the list 
         for (int i = generation + 1; i < arrSize; i++){
             if (arr[i] < arr[smPos])
                 smPos = i;
@@ -32,8 +49,8 @@ public class Algorithms {
         arr[smPos] = temp;
 
         generation++;   // updates generation
+        updateGrid(arr);
     }
-
 
 
     public void InsertionSort() {
@@ -42,14 +59,14 @@ public class Algorithms {
         if (x < arrSize) {
             int num = arr[x]; 
 
-            // Compares element num to its predecessor and swaps the two if num is smaller
-            // Swaps continue until num is in its correct place 
+            // Compares element num to its predecessor and swaps the two if num is smaller 
             while(x > 0 && arr[x-1] > num ){
                 arr[x] = arr[x-1]; 
                 x--;
             }
             arr[x] = num;
             generation++;
+            updateGrid(arr);
         }
     }
 
@@ -123,6 +140,7 @@ public class Algorithms {
         if (sorted == false) {
             randomize(arr, arrSize); 
         }
+        updateGrid(arr);
     }
 
 
@@ -131,14 +149,23 @@ public class Algorithms {
      * You can learn more about the algorithm here:
      * https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ 
      */
-    public void randomize(int arr[], int n) {
+    private static void randomize(int arr[], int size) {
         Random r = new Random();
-        for (int i = n-1; i > 0; i--) {
+        for (int i = size-1; i > 0; i--) {
             int j = r.nextInt(i+1);     // Pick a random index from 0 to i
             
             int temp = arr[i];
             arr[i] = arr[j];
             arr[j] = temp;
+        }
+    }
+
+    public void updateGrid(int arr[]) {
+        int y = MAX_ROWS-1;
+        for (int i = 0; i < arrSize; i++) {
+            for (int j = 0; j < arr[i]; j++) { // y-j
+                grid[y-j][i] = true;
+            }
         }
     }
 
