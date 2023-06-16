@@ -160,11 +160,11 @@ public class App extends Application {
 
         for (int i = 0; i < alg.MAX_ROWS; i++) {
             for (int j = 0; j < alg.MAX_COLUMNS; j++) {
-                if (alg.isFilled(i, j)) {
-                    double y = ch * i;
-                    double x = ch * j;
-                    gc.fillRect(x, y, cw, ch);
-                }
+                // if (alg.isFilled(i, j)) {   TODO: FIX ME
+                //     double y = ch * i;
+                //     double x = ch * j;
+                //     gc.fillRect(x, y, cw, ch);
+                // }
             }
         }
 
