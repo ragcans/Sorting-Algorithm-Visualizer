@@ -4,12 +4,11 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import java.io.*;
-import java.util.*;
 import javafx.collections.*;
-import javafx.collections.transformation.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import java.io.*;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,30 +22,28 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.geometry.Pos;
-
-import java.util.Random;
+import java.util.*;
 
 
 /**
  * JavaFX App
  */
-public class App extends Application {
-    private ObservableList<String> algorithmList;
-    private ComboBox<String> algListBox;
+public class Visualizer extends Application {
     private Label generationLabel = new Label();
-    private Button runPauseButton;
+    //private Button runPauseButton;
     private Button selAlgButton;
     private Button insAlgButton;
     private Button mergeAlgButton;
     private Button bogoAlgButton;
     private Button stepButton;
     private Button resetCountButton;
+    private Button generateSeedButton;
     private Label stepTimeCaption;
     private Algorithms alg;
     private boolean running;
     private Canvas canvas;
+    private SortingAlgorithm currentAlgorithm;
+
 
     private Timeline timeline;
 
@@ -57,17 +54,15 @@ public class App extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        algorithmList.addAll("Selection Sort", "Insertion Sort", "Merge Sort", "Bogo Sort");
-        algListBox = new ComboBox<>(algorithmList);
-        algListBox.setValue(algorithmList.get(0));
 
-        runPauseButton = new Button("Run");
         stepButton = new Button("Step");
-        resetCountButton = new Button("Reset Gen Count");        
-        selAlgButton = new Button("Selection Sort");
-        insAlgButton = new Button("Insertion Sort");
-        mergeAlgButton = new Button("Merge Sort");
-        bogoAlgButton = new Button("Bogo Sort");
+        resetCountButton = new Button("Reset Gen Count");
+        generateSeedButton = new Button("Generate Random Values");
+        selAlgButton = createSortingButton("Selection Sort", SortingAlgorithm.SELECTION_SORT);
+        insAlgButton = createSortingButton("Insertion Sort", SortingAlgorithm.INSERTION_SORT);
+        mergeAlgButton = createSortingButton("Merge Sort", SortingAlgorithm.MERGE_SORT);
+        bogoAlgButton = createSortingButton("Bogo Sort", SortingAlgorithm.BOGO_SORT);
+        alg = new Algorithms();
         
         stepTimeCaption = new Label();        
         running = false;
@@ -81,7 +76,7 @@ public class App extends Application {
         bPane.setTop(generationLabel);
 
         HBox userBox = new HBox(8);
-        userBox.getChildren().addAll(algListBox, runPauseButton, stepButton, resetCountButton);
+        userBox.getChildren().addAll(generateSeedButton, stepButton, resetCountButton);
         HBox timeBox = new HBox(8);
         timeBox.getChildren().addAll(stepTimeCaption);
         HBox algBox = new HBox(8);
@@ -97,20 +92,14 @@ public class App extends Application {
         bPane.setCenter(canvas);
 
 
-
-        runPauseButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                running = !running;
-                runPauseButton.setText(running ? "Pause" : "Run");
-            }
-        });
-
         resetCountButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 alg.resetGeneration();
-                generationLabel.setText(algListBox.getValue() + "; Generation: " + alg.getGeneration());
+                generationLabel.setText(currentAlgorithm + "; Generation: " + alg.getGeneration());
             }
         });
+
+
 
         // TODO: Get the time thing to work
         // stepTimeCaption.textProperty().bind(
@@ -150,25 +139,69 @@ public class App extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         double w = gc.getCanvas().getWidth();
         double h = gc.getCanvas().getHeight();
-        double cw = w / alg.MAX_COLUMNS;
-        double ch = h / alg.MAX_ROWS;
+        double cw = w / Algorithms.MAX_COLUMNS;
+        double ch = h / Algorithms.MAX_ROWS;
 
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, w, h);
 
         gc.setFill(Color.BLACK);
 
-        for (int i = 0; i < alg.MAX_ROWS; i++) {
-            for (int j = 0; j < alg.MAX_COLUMNS; j++) {
-                // if (alg.isFilled(i, j)) {   TODO: FIX ME
-                //     double y = ch * i;
-                //     double x = ch * j;
-                //     gc.fillRect(x, y, cw, ch);
-                // }
+        for (int i = 0; i < Algorithms.MAX_ROWS; i++) {
+            for (int j = 0; j < Algorithms.MAX_COLUMNS; j++) {
+                if (alg.isFilled(i, j)) {   
+                    double y = ch * i;
+                    double x = ch * j;
+                    gc.fillRect(x, y, cw, ch);
+                }
             }
         }
 
-        // TODO: Update a 2D array in every single alg method
+    }
+
+    private Button createSortingButton(String text, SortingAlgorithm algorithm) {
+        Button button = new Button(text);
+        button.setOnAction(event -> {
+            currentAlgorithm = algorithm;
+            sortArray();
+        });
+        return button;
+    }
+
+    private void sortArray() {
+        if (currentAlgorithm == null || alg.getArray() == null) {
+            return;
+        }
+
+        switch (currentAlgorithm) {
+            // TODO: REPLACE EVERY alg.sort() with a method in this file that uses it like this:
+            //void gridSelSort() {
+            //     alg.SelectionSort();
+            //     look at ethans update visualization stuff
+            // }
+            case SELECTION_SORT:
+                while (true) {
+                    alg.SelectionSort();
+                    updateScreen();
+                    break;
+                }
+            case INSERTION_SORT:
+                alg.InsertionSort();
+                break;
+            case MERGE_SORT:
+                //mergeSort(0, array.length - 1);
+                break;
+            case BOGO_SORT:
+                alg.BogoSort();
+                break;
+        }
+    }
+
+    private enum SortingAlgorithm {
+        SELECTION_SORT,
+        INSERTION_SORT,
+        MERGE_SORT,
+        BOGO_SORT
     }
 
 }

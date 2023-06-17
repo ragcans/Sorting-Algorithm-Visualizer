@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Algorithms {     
-    public static final int MAX_COLUMNS = 5;    // number of elements in arr
+    public static final int MAX_COLUMNS = 20;    // number of elements in arr
     public static int MAX_ROWS;
     private boolean[][] grid;
     private static int[] arr;
@@ -13,12 +13,12 @@ public class Algorithms {
 
     public Algorithms() {
         arr = new int[arrSize];
-        Random r = new Random();
+        //Random r = new Random();
 
         // creates an array of random numbers
         for (int i = 0; i < arrSize; i++) {
-            int rng = r.nextInt(5) + 1; // rng from 1-5
-            arr[i] = i * rng;
+            //int rng = r.nextInt(5) + 1; // rng from 1-5
+            arr[i] = i;// * rng;
         }
 
         // finds the largest element in the array 
@@ -173,6 +173,23 @@ public class Algorithms {
     /** Accessor method -- returns the number of times an algorithm has been interated. */
     public int getGeneration() {
         return generation;
+    }
+
+    /** Accessor method for locations on the grid. App uses this method to
+      * determine if a current cell has value or not. */
+    public boolean isFilled (int row, int column) { 
+        return grid[row][column];
+    }
+
+
+    /** Accessor method */ 
+    public int[] getArray() {
+        return arr;
+    }
+
+    /** Accessor method */
+    public boolean[][] getGrid() {
+        return grid;
     }
 
     /** Resets the generation count to 0. */
