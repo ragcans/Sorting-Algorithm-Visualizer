@@ -1,30 +1,18 @@
 package sorting;
-
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.collections.*;
+ 
+import javafx.application.Application; 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import java.io.*;
+import javafx.geometry.Insets; 
 import javafx.scene.Scene; 
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Button; 
+import javafx.scene.control.Label; 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import java.util.*;
-import javafx.util.Duration;
+import javafx.stage.Stage; 
 
 
 /**
@@ -177,7 +165,8 @@ public class Visualizer extends Application {
                 updateScreen();
                 break;
             case "Merge Sort":
-                alg.MergeSort(arr, null);
+                arr = alg.MergeSort(arr);
+                updateScreen();
                 break;
             case "Bogo Sort":
                 alg.BogoSort(arr);
@@ -192,7 +181,8 @@ public class Visualizer extends Application {
                 updateScreen();
                 break;
             case "Merge Step":
-                alg.MergeSort(arr, null);
+                arr = alg.MergeSort(arr);
+                updateScreen();
                 break;
             case "Bogo Step":
                 alg.BogoSort(arr);

@@ -5,14 +5,12 @@ import java.util.Random;
 
 
 public class Algorithms {     
-    private static int ARRAY_SIZE = 20;
+    private static int ARRAY_SIZE = 100;
     private static final int ARRAY_MIN_VALUE = 1;
     private static final int ARRAY_MAX_VALUE = 200;
     public static final int MAX_COLUMNS = ARRAY_SIZE;    // number of elements in arr
     public static int MAX_ROWS;
-    public int generation = 0;
-
-    public Algorithms() {}
+    public int generation = 0; 
 
 
     public void SelectionSort(int[] arr) { 
@@ -51,19 +49,19 @@ public class Algorithms {
 
 
     // TODO: MAKE NON RECURSIVE
-    public int[] MergeSort(int[] arr, int[] list) {
+    public int[] MergeSort(int[] arr) {
         // Base case: A list of size 1 is already sorted.
-        if(ARRAY_SIZE <= 1) {
+        if(arr.length <= 1) {
             return arr;
         }
         
         // Copy each half of the array
-        int[] leftHalf = Arrays.copyOfRange(arr, 0, ARRAY_SIZE/2);
-        int[] rightHalf = Arrays.copyOfRange(arr, ARRAY_SIZE/2, ARRAY_SIZE);
+        int[] leftHalf = Arrays.copyOfRange(arr, 0, arr.length/2);
+        int[] rightHalf = Arrays.copyOfRange(arr, arr.length/2, arr.length);
 
         // Recursively sort each half
-        leftHalf = MergeSort(arr, leftHalf);
-        rightHalf = MergeSort(arr, rightHalf);
+        leftHalf = MergeSort(leftHalf);
+        rightHalf = MergeSort(rightHalf);
 
         // Merge the two sorted lists together
         arr = mergeLists(leftHalf, rightHalf);
@@ -72,6 +70,7 @@ public class Algorithms {
         
         return arr;
     }
+
 
     public int[] mergeLists(int[] listA, int[] listB){
         // Create a new array with the combined length of of listA and listB
