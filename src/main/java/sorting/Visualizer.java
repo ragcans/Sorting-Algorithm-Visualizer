@@ -7,6 +7,7 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.*;
 import javafx.scene.Scene;
@@ -19,10 +20,13 @@ import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import java.util.*;
+import javafx.util.Duration;
 
 
 /**
@@ -30,22 +34,17 @@ import java.util.*;
  */
 public class Visualizer extends Application {
     private Label generationLabel = new Label();
-    //private Button runPauseButton;
+    private Label stepTimeCaption;
     private Button selAlgButton;
     private Button insAlgButton;
     private Button mergeAlgButton;
     private Button bogoAlgButton;
-    private Button stepButton;
     private Button resetCountButton;
     private Button generateSeedButton;
-    private Label stepTimeCaption;
     private Algorithms alg;
-    private boolean running;
-    private Canvas canvas;
-    private SortingAlgorithm currentAlgorithm;
-
-
-    private Timeline timeline;
+    private String currentAlgorithm;
+    private Rectangle[] rectangles; 
+    private int[] arr;
 
     public static void main(String[] args) {
         launch();
@@ -55,147 +54,135 @@ public class Visualizer extends Application {
     public void init() throws Exception {
         super.init();
 
-        stepButton = new Button("Step");
         resetCountButton = new Button("Reset Gen Count");
-        generateSeedButton = new Button("Generate Random Values");
-        selAlgButton = createSortingButton("Selection Sort", SortingAlgorithm.SELECTION_SORT);
-        insAlgButton = createSortingButton("Insertion Sort", SortingAlgorithm.INSERTION_SORT);
-        mergeAlgButton = createSortingButton("Merge Sort", SortingAlgorithm.MERGE_SORT);
-        bogoAlgButton = createSortingButton("Bogo Sort", SortingAlgorithm.BOGO_SORT);
+        generateSeedButton = new Button("Randomize");
+        selAlgButton = createSortingButton("Selection Sort");
+        insAlgButton = createSortingButton("Insertion Sort");
+        mergeAlgButton = createSortingButton("Merge Sort");
+        bogoAlgButton = createSortingButton("Bogo Sort");
+        
         alg = new Algorithms();
+        arr = Algorithms.getArray();
+        rectangles = createRectangles(arr);
         
         stepTimeCaption = new Label();        
-        running = false;
     }
 
     @Override
-    public void start(Stage stage) {
-        BorderPane bPane = new BorderPane();
-        canvas = new Canvas(500, 500);
+    public void start(Stage stage) { 
 
-        bPane.setTop(generationLabel);
-
+        // button containers
         HBox userBox = new HBox(8);
-        userBox.getChildren().addAll(generateSeedButton, stepButton, resetCountButton);
+        userBox.getChildren().addAll(generateSeedButton, resetCountButton, generationLabel);
         HBox timeBox = new HBox(8);
         timeBox.getChildren().addAll(stepTimeCaption);
         HBox algBox = new HBox(8);
         algBox.getChildren().addAll(selAlgButton, insAlgButton, mergeAlgButton, bogoAlgButton);
 
-        VBox bottomBox = new VBox(8);
-        bottomBox.getChildren().addAll(userBox);
-        bPane.setBottom(bottomBox); 
-        VBox topBox = new VBox(8);
-        topBox.getChildren().addAll(timeBox, algBox);
-        bPane.setTop(topBox);
+        // rectangles
+        Pane visualizationPane = new Pane(rectangles);
+        visualizationPane.setMinHeight(Algorithms.getArrMax());
+        visualizationPane.setMaxHeight(Algorithms.getArrMax());
+        visualizationPane.setMinWidth(Algorithms.getArrSize() * 10);
+        visualizationPane.setMaxWidth(Algorithms.getArrSize() * 10);
 
-        bPane.setCenter(canvas);
-
+        VBox root = new VBox(8);
+        root.setPadding(new Insets(10));
+        root.getChildren().addAll(userBox, timeBox, visualizationPane, algBox);  
 
         resetCountButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
+            @Override 
+            public void handle(ActionEvent e) {
                 alg.resetGeneration();
                 generationLabel.setText(currentAlgorithm + "; Generation: " + alg.getGeneration());
             }
         });
 
-
-
-        // TODO: Get the time thing to work
-        // stepTimeCaption.textProperty().bind(
-        //     Bindings.format("%.3f sec", stepTimeSlider.valueProperty())
-        // );
-        
-        // timeline = new Timeline(
-        //     new KeyFrame(Duration.seconds(stepTimeSlider.getValue()), e -> {
-        //         if(!running)
-        //             return;
-        //         try{
-        //             life.passTime();
-        //             updateBoard();
-        //         } catch (Exception ex){
-        //             running = false;
-        //             throw ex;
-        //         }
-        //     }));
-        // timeline.setAutoReverse(true);
-        // timeline.setCycleCount(Timeline.INDEFINITE);
-
-        /* whats good future me its past you. the whole stepTimeSlider.value()
-         * stuff is pretty weird but maybe it is just the regular time value 
-         * multiplied by whatever the slider is. try to experiment around with 
-         * just putting in the number 0.5 or 1 or try to implement the slider **/
+        generateSeedButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override 
+            public void handle(ActionEvent e) {
+                arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
+                Algorithms.setArray(arr);
+                updateScreen();
+            }
+        });
 
         stage.setTitle("Algorithms");
-        stage.setScene(new Scene(bPane));
+        stage.setScene(new Scene(root));
         stage.show();
-
-        //timeline.play();
-
-        
     }
 
     public void updateScreen() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        double w = gc.getCanvas().getWidth();
-        double h = gc.getCanvas().getHeight();
-        double cw = w / Algorithms.MAX_COLUMNS;
-        double ch = h / Algorithms.MAX_ROWS;
-
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, w, h);
-
-        gc.setFill(Color.BLACK);
-
-        for (int i = 0; i < Algorithms.MAX_ROWS; i++) {
-            for (int j = 0; j < Algorithms.MAX_COLUMNS; j++) {
-                if (alg.isFilled(i, j)) {   
-                    double y = ch * i;
-                    double x = ch * j;
-                    gc.fillRect(x, y, cw, ch);
-                }
-            }
-        }
-
+        for (int i = 0; i < arr.length; i++) {
+            rectangles[i].setHeight(arr[i]);
+            rectangles[i].setY(Algorithms.getArrMax() - arr[i]);
+        }  
+        
     }
 
-    private Button createSortingButton(String text, SortingAlgorithm algorithm) {
+    private Button createSortingButton(String text) {
         Button button = new Button(text);
-        button.setOnAction(event -> {
-            currentAlgorithm = algorithm;
-            sortArray();
+        button.setOnAction(new EventHandler<ActionEvent>()  {
+            @Override
+            public void handle(ActionEvent e) { 
+                while (!isSorted()) { 
+                    currentAlgorithm = text;
+                    sortArray();
+                    updateScreen();
+                } 
+            }
         });
         return button;
     }
 
-    private void sortArray() {
-        if (currentAlgorithm == null || alg.getArray() == null) {
-            return;
+    private Rectangle[] createRectangles(int[] array) {
+        Rectangle[] rectangles = new Rectangle[array.length];
+        for (int i = 0; i < array.length; i++) {
+            rectangles[i] = new Rectangle(10, array[i], Color.BLUE);
+            rectangles[i].setX(i * 10);
+            rectangles[i].setY(Algorithms.getArrMax() - array[i]);
         }
+        return rectangles;
+    }
 
+    private void sortArray() { 
         switch (currentAlgorithm) {
-            // TODO: REPLACE EVERY alg.sort() with a method in this file that uses it like this:
-            //void gridSelSort() {
-            //     alg.SelectionSort();
-            //     look at ethans update visualization stuff
-            // }
-            case SELECTION_SORT:
-                while (true) {
-                    alg.SelectionSort();
-                    updateScreen();
-                    break;
-                }
-            case INSERTION_SORT:
-                alg.InsertionSort();
+            case "Selection Sort":
+                alg.SelectionSort();
+                updateScreen();
+                delay();
                 break;
-            case MERGE_SORT:
+            case "Insertion Sort":
+                alg.InsertionSort();
+                updateScreen();
+                break;
+            case "Merge Sort":
                 //mergeSort(0, array.length - 1);
                 break;
-            case BOGO_SORT:
+            case "Bogo Sort":
                 alg.BogoSort();
+                updateScreen();
                 break;
         }
     }
+
+     private boolean isSorted() {
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (arr[i] > arr[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void delay() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private enum SortingAlgorithm {
         SELECTION_SORT,

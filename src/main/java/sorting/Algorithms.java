@@ -1,36 +1,30 @@
 package sorting;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.Random; 
+
 
 public class Algorithms {     
-    public static final int MAX_COLUMNS = 20;    // number of elements in arr
+    private static int ARRAY_SIZE = 20;
+    private static final int ARRAY_MIN_VALUE = 1;
+    private static final int ARRAY_MAX_VALUE = 200;
+    public static final int MAX_COLUMNS = ARRAY_SIZE;    // number of elements in arr
     public static int MAX_ROWS;
-    private boolean[][] grid;
+
     private static int[] arr;
-    private int arrSize = MAX_COLUMNS;
     private int generation = 0;
 
-    public Algorithms() {
-        arr = new int[arrSize];
-        //Random r = new Random();
-
-        // creates an array of random numbers
-        for (int i = 0; i < arrSize; i++) {
-            //int rng = r.nextInt(5) + 1; // rng from 1-5
-            arr[i] = i;// * rng;
-        }
+    public Algorithms() { 
+        arr = generateRandomArray(ARRAY_SIZE, ARRAY_MIN_VALUE, ARRAY_MAX_VALUE);
 
         // finds the largest element in the array 
         MAX_ROWS = arr[0];
-        for (int i = 1; i < arrSize; i++) {
+        for (int i = 1; i < ARRAY_SIZE; i++) {
             if (arr[i] > MAX_ROWS) {
                 MAX_ROWS = arr[i];
             }
         }
 
-        grid = new boolean[MAX_ROWS][MAX_COLUMNS];
-        randomize(arr, arrSize);    // shuffles the array
     }
 
 
@@ -38,7 +32,7 @@ public class Algorithms {
         int smPos = generation;
 
         // finds the smallest element in the unsorted section of the list 
-        for (int i = generation + 1; i < arrSize; i++){
+        for (int i = generation + 1; i < ARRAY_SIZE; i++){
             if (arr[i] < arr[smPos])
                 smPos = i;
         }
@@ -48,15 +42,14 @@ public class Algorithms {
         arr[generation] = arr[smPos];
         arr[smPos] = temp;
 
-        generation++;   // updates generation
-        updateGrid(arr);
+        generation++;   // updates generation 
     }
 
 
     public void InsertionSort() {
         int x = generation + 1;
 
-        if (x < arrSize) {
+        if (x < ARRAY_SIZE) {
             int num = arr[x]; 
 
             // Compares element num to its predecessor and swaps the two if num is smaller 
@@ -66,7 +59,6 @@ public class Algorithms {
             }
             arr[x] = num;
             generation++;
-            updateGrid(arr);
         }
     }
 
@@ -74,13 +66,13 @@ public class Algorithms {
     // TODO: MAKE NON RECURSIVE
     public int[] MergeSort(int[] list) {
         // Base case: A list of size 1 is already sorted.
-        if(arrSize <= 1){
+        if(ARRAY_SIZE <= 1) {
             return arr;
         }
         
         // Copy each half of the array
-        int[] leftHalf = Arrays.copyOfRange(arr, 0, arrSize/2);
-        int[] rightHalf = Arrays.copyOfRange(arr, arrSize/2, arrSize);
+        int[] leftHalf = Arrays.copyOfRange(arr, 0, ARRAY_SIZE/2);
+        int[] rightHalf = Arrays.copyOfRange(arr, ARRAY_SIZE/2, ARRAY_SIZE);
 
         // Recursively sort each half
         leftHalf = MergeSort(leftHalf);
@@ -129,7 +121,7 @@ public class Algorithms {
         boolean sorted = true; 
 
         // checks if the array is sorted
-        for (int i = 0; i < arrSize-1; i++) {
+        for (int i = 0; i < ARRAY_SIZE-1; i++) {
             if (arr[i] > arr[i+1]) {
                 sorted = false;
                 break;
@@ -138,9 +130,8 @@ public class Algorithms {
 
         // if the array isnt sorted, shuffle the array
         if (sorted == false) {
-            randomize(arr, arrSize); 
-        }
-        updateGrid(arr);
+            shuffleArr(arr, ARRAY_SIZE); 
+        } 
     }
 
 
@@ -149,7 +140,7 @@ public class Algorithms {
      * You can learn more about the algorithm here:
      * https://www.geeksforgeeks.org/shuffle-a-given-array-using-fisher-yates-shuffle-algorithm/ 
      */
-    private static void randomize(int arr[], int size) {
+    public void shuffleArr(int arr[], int size) {
         Random r = new Random();
         for (int i = size-1; i > 0; i--) {
             int j = r.nextInt(i+1);     // Pick a random index from 0 to i
@@ -160,41 +151,44 @@ public class Algorithms {
         }
     }
 
-    public void updateGrid(int arr[]) {
-        int y = MAX_ROWS-1;
-        for (int i = 0; i < arrSize; i++) {
-            for (int j = 0; j < arr[i]; j++) { // y-j
-                grid[y-j][i] = true;
-            }
+    public int[] generateRandomArray(int size, int minValue, int maxValue) {
+        int[] array = new int[size];
+        Random random = new Random();
+        for (int i = 0; i < size; i++) {
+            array[i] = random.nextInt(maxValue - minValue + 1) + minValue;
         }
-    }
+        return array;
+    } 
 
-
-    /** Accessor method -- returns the number of times an algorithm has been interated. */
-    public int getGeneration() {
-        return generation;
-    }
-
-    /** Accessor method for locations on the grid. App uses this method to
-      * determine if a current cell has value or not. */
-    public boolean isFilled (int row, int column) { 
-        return grid[row][column];
-    }
-
-
-    /** Accessor method */ 
-    public int[] getArray() {
-        return arr;
-    }
-
-    /** Accessor method */
-    public boolean[][] getGrid() {
-        return grid;
-    }
 
     /** Resets the generation count to 0. */
     public void resetGeneration() {
         generation = 0;
+    }
+
+    /** getters/setter methods: */ 
+    public int getGeneration() {
+        return generation;
+    }
+
+    public static int[] getArray() {
+        return arr;
+    }
+
+    public static void setArray(int[] array) {
+        arr = array;
+    }
+
+    public static int getArrSize() {
+        return ARRAY_SIZE;
+    }
+
+    public static int getArrMin() {
+        return ARRAY_MIN_VALUE;
+    }
+
+    public static int getArrMax() {
+        return ARRAY_MAX_VALUE;
     }
 
 }
