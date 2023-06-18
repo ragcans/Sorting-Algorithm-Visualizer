@@ -10,12 +10,12 @@ public class Algorithms {
     private static final int ARRAY_MAX_VALUE = 200;
     public static final int MAX_COLUMNS = ARRAY_SIZE;    // number of elements in arr
     public static int MAX_ROWS;
-    private int generation = 0;
+    public int generation = 0;
 
     public Algorithms() {}
 
 
-    public void SelectionSort(int[] arr) {
+    public void SelectionSort(int[] arr) { 
         int smPos = generation;
 
         // finds the smallest element in the unsorted section of the list 
@@ -31,7 +31,7 @@ public class Algorithms {
 
         generation++;   // updates generation 
     }
-
+  
 
     public void InsertionSort(int[] arr) {
         int x = generation + 1;
@@ -153,11 +153,7 @@ public class Algorithms {
         generation = 0;
     }
 
-    /** getter methods: */ 
-    public int getGeneration() {
-        return generation;
-    } 
-
+    /** getter methods: */  
     public static int getArrSize() {
         return ARRAY_SIZE;
     }

@@ -10,9 +10,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import java.io.*;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Scene; 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -39,7 +37,10 @@ public class Visualizer extends Application {
     private Button insAlgButton;
     private Button mergeAlgButton;
     private Button bogoAlgButton;
-    private Button resetCountButton;
+    private Button selStepButton;
+    private Button insStepButton;
+    private Button mergeStepButton;
+    private Button bogoStepButton; 
     private Button generateSeedButton;
     private Algorithms alg;
     private String currentAlgorithm;
@@ -53,19 +54,33 @@ public class Visualizer extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-
-        resetCountButton = new Button("Reset Gen Count");
+ 
         generateSeedButton = new Button("Randomize");
         selAlgButton = sortButton("Selection Sort");
         insAlgButton = sortButton("Insertion Sort");
         mergeAlgButton = sortButton("Merge Sort");
         bogoAlgButton = sortButton("Bogo Sort");
+        selStepButton = stepButton("Selection Step");
+        insStepButton = stepButton("Insertion Step");
+        mergeStepButton = stepButton("Merge Step");
+        bogoStepButton = stepButton("Bogo Step");
+
+        generateSeedButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override 
+            public void handle(ActionEvent e) {
+                alg.generation = 0;
+                generationLabel.setText("Generation: " + alg.generation);
+                arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
+                updateScreen();
+            }
+        });
+
         
         alg = new Algorithms();
         arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
         rectangles = createRectangles(arr);
         
-        stepTimeCaption = new Label();        
+        stepTimeCaption = new Label();
     }
 
     @Override
@@ -73,11 +88,13 @@ public class Visualizer extends Application {
 
         // button containers
         HBox userBox = new HBox(8);
-        userBox.getChildren().addAll(generateSeedButton, resetCountButton, generationLabel);
+        userBox.getChildren().addAll(generateSeedButton, generationLabel);
         HBox timeBox = new HBox(8);
         timeBox.getChildren().addAll(stepTimeCaption);
         HBox algBox = new HBox(8);
         algBox.getChildren().addAll(selAlgButton, insAlgButton, mergeAlgButton, bogoAlgButton);
+        HBox stepBox = new HBox(8);
+        stepBox.getChildren().addAll(selStepButton, insStepButton, mergeStepButton, bogoStepButton);
 
         // rectangles
         Pane visualizationPane = new Pane(rectangles);
@@ -88,27 +105,12 @@ public class Visualizer extends Application {
 
         VBox root = new VBox(8);
         root.setPadding(new Insets(10));
-        root.getChildren().addAll(userBox, timeBox, visualizationPane, algBox);  
-
-        resetCountButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override 
-            public void handle(ActionEvent e) {
-                alg.resetGeneration();
-                generationLabel.setText(currentAlgorithm + "; Generation: " + alg.getGeneration());
-            }
-        });
-
-        generateSeedButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override 
-            public void handle(ActionEvent e) {
-                arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
-                updateScreen();
-            }
-        });
+        root.getChildren().addAll(userBox, timeBox, visualizationPane, algBox, stepBox);  
 
         stage.setTitle("Algorithms");
         stage.setScene(new Scene(root));
         stage.show();
+        generationLabel.setText("Generation: " + alg.generation);
     }
 
     public void updateScreen() {
@@ -124,8 +126,10 @@ public class Visualizer extends Application {
         button.setOnAction(new EventHandler<ActionEvent>()  {
             @Override
             public void handle(ActionEvent e) { 
+                alg.generation = 0;
                 while (!isSorted()) { 
                     currentAlgorithm = text;
+                    generationLabel.setText(currentAlgorithm + "; Generation: " + alg.generation);
                     sortArray();
                     updateScreen();
                 } 
@@ -133,6 +137,24 @@ public class Visualizer extends Application {
         });
         return button;
     }
+    
+    private Button stepButton(String text) {
+        Button button = new Button(text);
+        button.setOnAction(new EventHandler<ActionEvent>()  {
+            @Override
+            public void handle(ActionEvent e) { 
+                if (!isSorted()) {
+
+                    currentAlgorithm = text;
+                    sortArray();
+                    generationLabel.setText(currentAlgorithm + "; Generation: " + alg.generation);
+                    updateScreen();
+                }
+            }
+        });
+        return button;
+    }
+
 
     private Rectangle[] createRectangles(int[] array) {
         Rectangle[] rectangles = new Rectangle[array.length];
@@ -148,17 +170,31 @@ public class Visualizer extends Application {
         switch (currentAlgorithm) {
             case "Selection Sort":
                 alg.SelectionSort(arr);
-                updateScreen();
-                delay();
+                updateScreen(); 
                 break;
             case "Insertion Sort":
                 alg.InsertionSort(arr);
                 updateScreen();
                 break;
             case "Merge Sort":
-                //mergeSort(0, array.length - 1);
+                alg.MergeSort(arr, null);
                 break;
             case "Bogo Sort":
+                alg.BogoSort(arr);
+                updateScreen();
+                break;
+            case "Selection Step":
+                alg.SelectionSort(arr);
+                updateScreen(); 
+                break;
+            case "Insertion Step":
+                alg.InsertionSort(arr);
+                updateScreen();
+                break;
+            case "Merge Step":
+                alg.MergeSort(arr, null);
+                break;
+            case "Bogo Step":
                 alg.BogoSort(arr);
                 updateScreen();
                 break;
@@ -173,14 +209,6 @@ public class Visualizer extends Application {
         }
         return true;
     }
-
-    private void delay() {
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
+ 
 
 }
