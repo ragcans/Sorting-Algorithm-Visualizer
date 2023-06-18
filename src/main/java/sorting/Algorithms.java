@@ -10,25 +10,12 @@ public class Algorithms {
     private static final int ARRAY_MAX_VALUE = 200;
     public static final int MAX_COLUMNS = ARRAY_SIZE;    // number of elements in arr
     public static int MAX_ROWS;
-
-    private static int[] arr;
     private int generation = 0;
 
-    public Algorithms() { 
-        arr = generateRandomArray(ARRAY_SIZE, ARRAY_MIN_VALUE, ARRAY_MAX_VALUE);
-
-        // finds the largest element in the array 
-        MAX_ROWS = arr[0];
-        for (int i = 1; i < ARRAY_SIZE; i++) {
-            if (arr[i] > MAX_ROWS) {
-                MAX_ROWS = arr[i];
-            }
-        }
-
-    }
+    public Algorithms() {}
 
 
-    public void SelectionSort() {
+    public void SelectionSort(int[] arr) {
         int smPos = generation;
 
         // finds the smallest element in the unsorted section of the list 
@@ -46,7 +33,7 @@ public class Algorithms {
     }
 
 
-    public void InsertionSort() {
+    public void InsertionSort(int[] arr) {
         int x = generation + 1;
 
         if (x < ARRAY_SIZE) {
@@ -64,7 +51,7 @@ public class Algorithms {
 
 
     // TODO: MAKE NON RECURSIVE
-    public int[] MergeSort(int[] list) {
+    public int[] MergeSort(int[] arr, int[] list) {
         // Base case: A list of size 1 is already sorted.
         if(ARRAY_SIZE <= 1) {
             return arr;
@@ -75,8 +62,8 @@ public class Algorithms {
         int[] rightHalf = Arrays.copyOfRange(arr, ARRAY_SIZE/2, ARRAY_SIZE);
 
         // Recursively sort each half
-        leftHalf = MergeSort(leftHalf);
-        rightHalf = MergeSort(rightHalf);
+        leftHalf = MergeSort(arr, leftHalf);
+        rightHalf = MergeSort(arr, rightHalf);
 
         // Merge the two sorted lists together
         arr = mergeLists(leftHalf, rightHalf);
@@ -117,7 +104,7 @@ public class Algorithms {
 
 
 
-    public void BogoSort() {
+    public void BogoSort(int[] arr) {
         boolean sorted = true; 
 
         // checks if the array is sorted
@@ -166,18 +153,10 @@ public class Algorithms {
         generation = 0;
     }
 
-    /** getters/setter methods: */ 
+    /** getter methods: */ 
     public int getGeneration() {
         return generation;
-    }
-
-    public static int[] getArray() {
-        return arr;
-    }
-
-    public static void setArray(int[] array) {
-        arr = array;
-    }
+    } 
 
     public static int getArrSize() {
         return ARRAY_SIZE;

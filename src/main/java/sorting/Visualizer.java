@@ -56,13 +56,13 @@ public class Visualizer extends Application {
 
         resetCountButton = new Button("Reset Gen Count");
         generateSeedButton = new Button("Randomize");
-        selAlgButton = createSortingButton("Selection Sort");
-        insAlgButton = createSortingButton("Insertion Sort");
-        mergeAlgButton = createSortingButton("Merge Sort");
-        bogoAlgButton = createSortingButton("Bogo Sort");
+        selAlgButton = sortButton("Selection Sort");
+        insAlgButton = sortButton("Insertion Sort");
+        mergeAlgButton = sortButton("Merge Sort");
+        bogoAlgButton = sortButton("Bogo Sort");
         
         alg = new Algorithms();
-        arr = Algorithms.getArray();
+        arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
         rectangles = createRectangles(arr);
         
         stepTimeCaption = new Label();        
@@ -102,7 +102,6 @@ public class Visualizer extends Application {
             @Override 
             public void handle(ActionEvent e) {
                 arr = alg.generateRandomArray(Algorithms.getArrSize(), Algorithms.getArrMin(), Algorithms.getArrMax());
-                Algorithms.setArray(arr);
                 updateScreen();
             }
         });
@@ -120,7 +119,7 @@ public class Visualizer extends Application {
         
     }
 
-    private Button createSortingButton(String text) {
+    private Button sortButton(String text) {
         Button button = new Button(text);
         button.setOnAction(new EventHandler<ActionEvent>()  {
             @Override
@@ -148,19 +147,19 @@ public class Visualizer extends Application {
     private void sortArray() { 
         switch (currentAlgorithm) {
             case "Selection Sort":
-                alg.SelectionSort();
+                alg.SelectionSort(arr);
                 updateScreen();
                 delay();
                 break;
             case "Insertion Sort":
-                alg.InsertionSort();
+                alg.InsertionSort(arr);
                 updateScreen();
                 break;
             case "Merge Sort":
                 //mergeSort(0, array.length - 1);
                 break;
             case "Bogo Sort":
-                alg.BogoSort();
+                alg.BogoSort(arr);
                 updateScreen();
                 break;
         }
@@ -183,12 +182,5 @@ public class Visualizer extends Application {
         }
     }
 
-
-    private enum SortingAlgorithm {
-        SELECTION_SORT,
-        INSERTION_SORT,
-        MERGE_SORT,
-        BOGO_SORT
-    }
 
 }
